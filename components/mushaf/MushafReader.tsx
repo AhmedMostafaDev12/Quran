@@ -33,11 +33,13 @@ const VerseMarker = ({ number }: { number: number }) => (
 export default function MushafReader({
   surah,
   onVerseClick,
-  selectedVerse
+  selectedVerse,
+  onOpenSurahList // New prop
 }: {
   surah: SurahDetail | null;
   onVerseClick: (ayah: Ayah) => void;
   selectedVerse: Ayah | null;
+  onOpenSurahList?: () => void; // New prop
 }) {
   const [menuAyah, setMenuAyah] = useState<Ayah | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -47,7 +49,7 @@ export default function MushafReader({
   const isContinuousRef = useRef(false);
 
   useEffect(() => {
-    const checkSize = () => setIsMobile(window.innerWidth < 640);
+    const checkSize = () => setIsMobile(window.innerWidth < 1024);
     checkSize();
     window.addEventListener('resize', checkSize);
     return () => {
@@ -59,7 +61,20 @@ export default function MushafReader({
     };
   }, []);
 
-  if (!surah) return <div className="p-8 text-center m-auto text-xl text-gold-light">اختر سورة للبدء</div>;
+  if (!surah) {
+    return (
+      <div className="p-8 text-center m-auto flex flex-col items-center gap-4">
+        <div className="text-xl text-gold-light">اختر سورة للبدء</div>
+        <button 
+          onClick={onOpenSurahList}
+          className="lg:hidden px-6 py-2 bg-gold text-[#0A0F1E] rounded-full font-bold shadow-lg flex items-center gap-2"
+        >
+          <span>📜</span>
+          <span>قائمة السور</span>
+        </button>
+      </div>
+    );
+  }
 
   const firstAyah = surah.ayahs[0];
   const juzNumber = firstAyah ? firstAyah.juz : '';
@@ -91,6 +106,15 @@ export default function MushafReader({
 
   return (
     <div className="w-full text-[#1a1104] p-2 sm:p-4 md:p-8 flex justify-center relative" dir="rtl">
+      {/* Mobile Floating Button */}
+      <button 
+        onClick={onOpenSurahList}
+        className="lg:hidden fixed bottom-20 right-4 z-40 w-14 h-14 bg-gold text-[#0A0F1E] rounded-full shadow-2xl border-2 border-[#0A0F1E]/20 flex items-center justify-center text-2xl hover:scale-110 active:scale-95 transition-all"
+        title="قائمة السور"
+      >
+        📜
+      </button>
+
       {/* Context Menu */}
       {menuAyah && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setMenuAyah(null)}>

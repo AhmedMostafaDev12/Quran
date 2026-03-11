@@ -18,6 +18,7 @@ export default function QuranApp() {
   const [currentSurah, setCurrentSurah] = useState<SurahDetail | null>(null);
   const [activeMainTab, setActiveMainTab] = useState('mushaf');
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileSurahList, setShowMobileSurahList] = useState(false);
 
   useEffect(() => {
     const checkSize = () => {
@@ -35,8 +36,36 @@ export default function QuranApp() {
     }
   };
 
+  const handleSurahSelect = (surah: SurahDetail) => {
+    setCurrentSurah(surah);
+    setShowMobileSurahList(false);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-[#0A0F1E] text-[#E8D5B0]" dir="rtl">
+    <div className="flex flex-col h-screen bg-[#0A0F1E] text-[#E8D5B0] relative overflow-hidden" dir="rtl">
+      {/* Mobile Surah List Drawer */}
+      {isMobile && (
+        <div 
+          className={`fixed inset-0 z-[100] transition-all duration-300 ${showMobileSurahList ? 'visible' : 'invisible'}`}
+        >
+          <div 
+            className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${showMobileSurahList ? 'opacity-100' : 'opacity-0'}`}
+            onClick={() => setShowMobileSurahList(false)}
+          />
+          <div 
+            className={`absolute top-0 right-0 h-full w-[80%] max-w-[300px] bg-[#0A0F1E] border-l border-gold border-opacity-30 transform transition-transform duration-300 ease-out ${showMobileSurahList ? 'translate-x-0' : 'translate-x-full'}`}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-gold border-opacity-20">
+              <h3 className="text-xl font-bold text-gold-light">قائمة السور</h3>
+              <button onClick={() => setShowMobileSurahList(false)} className="text-gold-light p-1">✕</button>
+            </div>
+            <div className="h-[calc(100%-60px)] overflow-y-auto">
+              <SurahList onSelect={handleSurahSelect} current={currentSurah?.number} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {isMobile ? (
@@ -48,6 +77,7 @@ export default function QuranApp() {
                   surah={currentSurah}
                   onVerseClick={handleTafseerRequest}
                   selectedVerse={selectedVerse}
+                  onOpenSurahList={() => setShowMobileSurahList(true)}
                 />
               </div>
             )}

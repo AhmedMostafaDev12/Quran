@@ -68,7 +68,7 @@ export default function AthkarPage() {
 
   const fetchAndFilterAthkar = async (tab: string, period: TimePeriod, occasion: OccasionInfo, hijri: any) => {
     setLoading(true);
-    let chapterId = ATHKAR_CHAPTERS.morning;
+    let chapterId: number = ATHKAR_CHAPTERS.morning;
 
     if (tab === 'special' || (tab === 'auto' && occasion.useGemini)) {
       try {
